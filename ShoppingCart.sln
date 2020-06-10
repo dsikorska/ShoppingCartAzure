@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShoppingCart.DurableFunction", "ShoppingCart.DurableFunction\ShoppingCart.DurableFunction.csproj", "{7EEE2135-4810-42D9-AC56-6EFF8F410EAE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7EEE2135-4810-42D9-AC56-6EFF8F410EAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EEE2135-4810-42D9-AC56-6EFF8F410EAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EEE2135-4810-42D9-AC56-6EFF8F410EAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EEE2135-4810-42D9-AC56-6EFF8F410EAE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {94BFACFC-72C4-4588-81DC-5A37BDE1128E}
+	EndGlobalSection
+EndGlobal
