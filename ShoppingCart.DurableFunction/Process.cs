@@ -1,46 +1,59 @@
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
+using ShoppingCart.DurableFunction.DataAccess.Models;
+using ShoppingCart.DurableFunction.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ShoppingCart.DurableFunction
 {
-    public static class Process
+    public class Process
     {
+        private readonly AppDbContext _context;
+
+        public Process(AppDbContext context)
+        {
+            _context = context;
+        }
+
         [FunctionName("Process")]
-        public static async Task<List<string>> RunOrchestrator(
-            [OrchestrationTrigger] IDurableOrchestrationContext context)
+        public async Task<List<Product>> RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
-            var outputs = new List<string>();
+            var input = context.GetInput<CartDTO>();
+            int cartId = await context.CallActivityAsync<int>("SaveCart", input);
 
-            // Replace "hello" with the name of your Durable Activity Function.
-            outputs.Add(await context.CallActivityAsync<string>("Process_Hello", "Tokyo"));
-            outputs.Add(await context.CallActivityAsync<string>("Process_Hello", "Seattle"));
-            outputs.Add(await context.CallActivityAsync<string>("Process_Hello", "London"));
-
-            // returns ["Hello Tokyo!", "Hello Seattle!", "Hello London!"]
-            return outputs;
+            return null;
         }
 
-        [FunctionName("Process_Hello")]
-        public static string SayHello([ActivityTrigger] string name, ILogger log)
+        [FunctionName("SaveCart")]
+        public async Task<int> SayHello([ActivityTrigger] CartDTO input, ILogger log)
         {
-            log.LogInformation($"Saying hello to {name}.");
-            return $"Hello {name}!";
+            log.LogInformation($"Saving {input.Products.Select(x => x.ProductId)}");
+
+            var cart = new Cart();
+            var products = input.Products.Select(x => new CartProduct { Cart = cart, ProductId = x.ProductId, Quantity = x.Quantity }).ToList();
+            cart.Products = products;
+
+            _context.Add(cart);
+            await _context.SaveChangesAsync();
+
+            return cart.Id;
         }
 
-        [FunctionName("Process_HttpStart")]
-        public static async Task<HttpResponseMessage> HttpStart(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
+        [FunctionName("Order")]
+        public async Task<HttpResponseMessage> HttpStart(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestMessage req,
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
-            // Function input comes from the request content.
-            string instanceId = await starter.StartNewAsync("Process", null);
+            var body = await req.Content.ReadAsAsync<CartDTO>(default(CancellationToken));
+
+            string instanceId = await starter.StartNewAsync("Process", null, body);
 
             log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 
