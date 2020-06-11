@@ -7,10 +7,13 @@
   <ItemGroup>
     <Compile Remove="Migrations\20200610210052_AddRelationships.cs" />
     <Compile Remove="Migrations\20200610210052_AddRelationships.Designer.cs" />
+    <Compile Remove="Migrations\20200611212133_test.cs" />
+    <Compile Remove="Migrations\20200611212133_test.Designer.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="4.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

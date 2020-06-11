@@ -1,10 +1,12 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ShoppingCart.DurableFunction.DataAccess.Models;
 using ShoppingCart.DurableFunction.Models;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -31,9 +33,9 @@ namespace ShoppingCart.DurableFunction
         }
 
         [FunctionName("SaveCart")]
-        public async Task<int> SayHello([ActivityTrigger] CartDTO input, ILogger log)
+        public async Task<int> SaveCart([ActivityTrigger] CartDTO input, ILogger log)
         {
-            log.LogInformation($"Saving {input.Products.Select(x => x.ProductId)}");
+            log.LogInformation($"Saving cart.");
 
             var cart = new Cart();
             var products = input.Products.Select(x => new CartProduct { Cart = cart, ProductId = x.ProductId, Quantity = x.Quantity }).ToList();
@@ -43,6 +45,17 @@ namespace ShoppingCart.DurableFunction
             await _context.SaveChangesAsync();
 
             return cart.Id;
+        }
+
+        [FunctionName("GenerateSummary")]
+        public void GenerateSummary([ActivityTrigger] int cartId, [Blob("summaries/{name}", FileAccess.Write)] Stream summary, ILogger log)
+        {
+            var cart = _context.Carts.FirstOrDefaultAsync(x => x.Id == cartId);
+
+            if (cart == null)
+            {
+                log.LogError($"Cart {cartId} not found.");
+            }
         }
 
         [FunctionName("Order")]
