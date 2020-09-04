@@ -39,7 +39,15 @@ namespace ShoppingCart.DurableFunction
                 if (orderConfirmed == await Task.WhenAny(orderConfirmed, timeout))
                 {
                     cts.Cancel();
-                    await context.CallActivityAsync(nameof(StatusProcessingCart), cartId);
+
+                    if (orderConfirmed.Result)
+                    {
+                        await context.CallActivityAsync(nameof(StatusProcessingCart), cartId);
+                    }
+                    else
+                    {
+                        await context.CallActivityAsync(nameof(StatusRejectedCart), cartId);
+                    }
                 }
                 else
                 {
