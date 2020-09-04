@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShoppingCart.DurableFunction.DataAccess.Models;
+using ShoppingCart.DurableFunction.Shared.Models;
+using System;
 
 namespace ShoppingCart.DurableFunction
 {
@@ -20,6 +22,11 @@ namespace ShoppingCart.DurableFunction
             modelBuilder.Entity<Product>().HasKey(x => x.Id);
 
             modelBuilder.Entity<Cart>().HasKey(x => x.Id);
+            modelBuilder.Entity<Cart>().Property(x => x.Status)
+                .HasConversion(
+                v => v.ToString(),
+                v => (Status)Enum.Parse(typeof(Status), v));
+            modelBuilder.Entity<Cart>().Property(x => x.Email).IsRequired().HasMaxLength(200);
 
             modelBuilder.Entity<CartProduct>().HasKey(x => x.Id);
             modelBuilder.Entity<CartProduct>().HasOne(x => x.Product).WithMany();

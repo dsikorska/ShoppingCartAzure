@@ -5,5 +5,7 @@ namespace ShoppingCart.DurableFunction.Models
     public class CartDTO
     {
         public IEnumerable<CartProductDTO> Products { get; set; } = new List<CartProductDTO>();
+
+        public string Email { get; set; }
     }
 }
